@@ -1,0 +1,23 @@
+{
+  "name": "wallet-generator",
+  "version": "0.0.1",
+  "description": "",
+  "scripts": {
+    "start": "tsc && node dist/main",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/inquirer": "^8.2.1",
+    "@types/node": "^18.6.3",
+    "dayjs": "^1.11.4",
+    "dotenv": "^16.0.1",
+    "ethers": "^5.6.9",
+    "inquirer": "^8.2.4",
+    "rxjs": "^7.5.6",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.7.4"
+  }
+}
