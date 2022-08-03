@@ -13,6 +13,10 @@ export class WalletGenerator {
     return new Array(amount).fill(0).map(() => this.generateOne())
   }
 
+  generateWithSuffix (amount: number, suffix: string): WalletInfo[] {
+    return new Array(amount).fill(0).map(() => this.generateOneWithSuffix(suffix))
+  }
+
   generateOne (): WalletInfo {
     const wallet = Wallet.createRandom()
 
@@ -20,6 +24,16 @@ export class WalletGenerator {
       address: wallet.address,
       publicKey: wallet.publicKey,
       privateKey: wallet.privateKey,
+    }
+  }
+
+  generateOneWithSuffix (suffix: string): WalletInfo {
+    while (true) {
+      const walletInfo = this.generateOne()
+
+      if (walletInfo.address.slice(-1 * suffix.length) === suffix) {
+        return walletInfo
+      }
     }
   }
 }
