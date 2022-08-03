@@ -15,7 +15,7 @@ const ask$ = (): Observable<Answers> => from(inquirer.prompt([
     message: '请输入要生成的钱包数量:',
   }
 ])).pipe(
-  tap((answers: Answers) => {
+  tap(answers => {
     const walletGenerator = new WalletGenerator()
     const { generateWalletAmount } = answers
     const walletInfos = walletGenerator.generate(generateWalletAmount)
