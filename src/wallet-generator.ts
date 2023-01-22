@@ -1,6 +1,6 @@
 import { Wallet } from 'ethers'
 
-interface WalletInfo {
+export interface WalletInfo {
   address: string
   publicKey: string
   privateKey: string
@@ -27,7 +27,27 @@ export class WalletGenerator {
     }
   }
 
+  async generateOneAsync (): Promise<WalletInfo> {
+    const wallet = Wallet.createRandom()
+
+    return {
+      address: wallet.address,
+      publicKey: wallet.publicKey,
+      privateKey: wallet.privateKey,
+    }
+  }
+
   generateOneWithSuffix (suffix: string): WalletInfo {
+    while (true) {
+      const walletInfo = this.generateOne()
+
+      if (walletInfo.address.slice(-1 * suffix.length) === suffix) {
+        return walletInfo
+      }
+    }
+  }
+
+  async generateOneWithSuffixAsync (suffix: string): Promise<WalletInfo> {
     while (true) {
       const walletInfo = this.generateOne()
 
