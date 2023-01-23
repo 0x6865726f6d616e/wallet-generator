@@ -1,4 +1,7 @@
-import { Wallet } from 'ethers'
+import { ethers } from 'ethers'
+import * as crypto from 'node:crypto'
+import * as secp256k1 from '@noble/secp256k1'
+import * as sha3 from '@noble/hashes/sha3'
 
 export interface WalletInfo {
   address: string
@@ -18,17 +21,7 @@ export class WalletGenerator {
   }
 
   generateOne (): WalletInfo {
-    const wallet = Wallet.createRandom()
-
-    return {
-      address: wallet.address,
-      publicKey: wallet.publicKey,
-      privateKey: wallet.privateKey,
-    }
-  }
-
-  async generateOneAsync (): Promise<WalletInfo> {
-    const wallet = Wallet.createRandom()
+    const wallet = new ethers.Wallet(crypto.randomBytes(32))
 
     return {
       address: wallet.address,
@@ -38,22 +31,42 @@ export class WalletGenerator {
   }
 
   generateOneWithSuffix (suffix: string): WalletInfo {
-    while (true) {
-      const walletInfo = this.generateOne()
+    suffix = suffix.toLowerCase()
 
-      if (walletInfo.address.slice(-1 * suffix.length) === suffix) {
+    let i = 0
+
+    while (true) {
+      i++
+
+      const info = this.generateRandomOneFast()
+
+      if (ethers.utils.hexlify(info.address).endsWith(suffix)) {
+        const walletInfo: WalletInfo = {
+          privateKey: ethers.utils.hexlify(info.privateKey),
+          publicKey: ethers.utils.hexlify(info.publicKey),
+          address: ethers.utils.getAddress(ethers.utils.hexlify(info.address))
+        }
+
+        console.log(i, walletInfo.address, walletInfo.privateKey)
+
         return walletInfo
       }
     }
   }
 
-  async generateOneWithSuffixAsync (suffix: string): Promise<WalletInfo> {
-    while (true) {
-      const walletInfo = this.generateOne()
+  private generateRandomOneFast (): {
+    privateKey: Uint8Array
+    publicKey: Uint8Array
+    address: Uint8Array
+  } {
+    const privateKey = crypto.randomBytes(32)
+    const publicKey = secp256k1.getPublicKey(privateKey)
+    const address = sha3.keccak_256(publicKey.slice(1)).slice(12)
 
-      if (walletInfo.address.slice(-1 * suffix.length) === suffix) {
-        return walletInfo
-      }
+    return {
+      privateKey,
+      publicKey,
+      address
     }
   }
 }
