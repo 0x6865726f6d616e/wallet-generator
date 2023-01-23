@@ -82,7 +82,7 @@ const generateOne = async (suffix: string): Promise<WalletInfo> => {
 
   console.log(startTime, `start`)
 
-  const numCPUs = Math.floor(os.cpus().length / 2)
+  const numCPUs = Math.floor(os.cpus().length - 1)
 
   const children: childProcess.ChildProcess[] = []
 
