@@ -9,12 +9,19 @@ import { from, Observable, tap } from 'rxjs'
 import inquirer from 'inquirer'
 
 interface Answers {
+  generateMethod: number
   generateWalletAmount: number
   generateWalletSuffix: string
 }
 
 const ask$ = (): Observable<Answers> => from(
   inquirer.prompt([
+    {
+      type: 'number',
+      name: 'generateMethod',
+      message: '请输入生成方式（0：地址后缀；1：Uint256尾数）',
+      default: 0,
+    },
     {
       type: 'number',
       name: 'generateWalletAmount',
@@ -29,11 +36,12 @@ const ask$ = (): Observable<Answers> => from(
   .pipe(
     tap(async answers => {
       const {
+        generateMethod: number,
         generateWalletAmount: amount,
         generateWalletSuffix: suffix,
       } = answers
 
-      if (amount >= 11 || amount <= 0) {
+      if (amount >= 99999 || amount <= 0) {
         console.log('无效的数量')
         return
       }
@@ -50,13 +58,13 @@ const ask$ = (): Observable<Answers> => from(
       } else {
         const generator = new WalletGenerator()
 
-        if (suffix.length > 2) {
+        if (suffix.length > 6) {
           console.log('无效的后缀')
           return
         }
 
         infos.push(...suffix ?
-          generator.generateWithSuffix(amount, suffix) :
+          answers.generateMethod === 0 ? generator.generateWithSuffix(amount, suffix) : generator.generateWithUint256Suffix(amount, parseInt(suffix)) :
           generator.generate(amount))
       }
 
@@ -106,7 +114,7 @@ const generateOne = async (suffix: string): Promise<WalletInfo> => {
     children.push(child)
   }
 
-  const request: MainRequest = { suffix: suffix }
+  const request: MainRequest = {suffix: suffix}
 
   for (const child of children) {
     child.send(request)
